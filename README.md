@@ -1,2 +1,14 @@
 # SNA_Workshop
-This is a one-stop-shop for a series of workshops on Social Network Analysis written by Tom R. Leppard
+
+## WELCOME :)
+This is a one-stop-shop for a series of workshops on Social Network Analysis written by Tom R. Leppard.   
+
+## INTRODUCTION
+Social scientists often speak of social structure, relationships, and the flow of resources through interaction. Social network analysis provides powerful tools to study these dynamics: it allows us to map social structures, visualise relationships, and identify the key actors who shape and control the flow of resources.
+
+In this material, you will learn the fundamentals of social network analysis using RStudio. Attendees can expect to learn the fundamentals of social network analysis; including basic data management, more advanced analytic tools that use network data to inform us about the structure and nature of social relations, and basic visualisation. This course does not require experience in coding. Attendees of all stages and abilities are welcome. Free online resources for students will be provided to aid advancement beyond this course. 
+
+## ORIENTATION
+To get going, you will need to download R and Rstudio. Please follow [these slides](https://docs.google.com/presentation/d/e/2PACX-1vQ2tUVmEaI9ZYzbodrtJLYKMmeswqOo5T2fsShbQl4Rbu1D-SMjGBcJp2q07cl8v2KapSLNeZKpnkjo/pub?start=false&loop=false&delayms=3000&slide=id.g30e7f92037d_0_12) written by Jeanne McLure to do so. 
+
+If you are unable or unwilling to download the software, no worries. Head over to [Posit cloud](https://posit.cloud/plans/free) and create a freee acount. Once you have created your account, please open a new Rstudio project. This is a cloud-based version of the software that you can use. 
