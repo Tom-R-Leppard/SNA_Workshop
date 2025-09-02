@@ -1,0 +1,147 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(igraph)
+```
+
+# Measuring Duality in Two-Mode Networks
+
+A more advanced analysis of two-mode networks is to apply the theory/logic of Breiger's (1974) duality of persons and groups. The logic behind this theory is that if people mutually affiliate with a group then they are symbolically connected.
+
+You can think about a duality existing between students and the student groups they are affiliated with, for example. Students who share affiliations with a club or organisation on campus could be considered symbolically connected through theory connection to the groups. The strength of that symbolic connection can be operationalised in terms of how many groups they are mutually affiliated to. The more clubs they both attend or are affiliated with, the stronger their symbolic connection together. To do this we use a tool called bipartite projection. Bipartite projection is another word for two-mode.
+
+## The Data
+
+First, though, we have to bring in our two mode network. Your two mode network may be stored as an adjacency matrix or an edgelist. The following chunk brings in a two mode network stored as an adjacency matrix. The rows of this matrix represent characters from the Harry Potter story and the columns represent various groups or organisations that are prevelant in the story. As you would expect when working with two mode network data, the 1s in the cells indicate that the character is associated with the group while a 0 indicates they are not. I collected these data from this site - https://harrypotter.fandom.com/wiki/Dumbledore%27s_Army I simply I googled “list of prefects at hogwarts” then deferred to that above wiki. Same for phoenix, death eaters etc.
+
+```{r}
+hp <- read.csv(file.choose(),header=TRUE,row.names=1) ## select harry_potter_two_mode.csv
+
+hp_mat <- as.matrix(hp)
+
+head(hp_mat)
+```
+
+## Visualising the Network
+
+No we have an idea of what these data look like, let's use igraph's graph_from_biadjacency_matrix() function to convert this into a network and then visualise it. The chunk below converts it into a network object, then visualises the network where green dots represent the characters and orange squares represent the groups they are affiliated with in the story.
+
+```{r}
+
+hp_aff <- graph_from_biadjacency_matrix(hp_mat)
+
+shapes <- c("circle", "square")
+colors <-c("green", "orange")
+
+par(mar =c(5,0,2,0))
+set.seed(123)
+plot(hp_aff, vertex.color=colors[V(hp_aff)$type+1],
+     vertex.shape=shapes[V(hp_aff)$type+1], vertex.label.cex = 0.5, vertex.size = 7, main = "Harry Potter", sub = "Characters Connected to Groups")
+```
+
+## Bipartite Projection
+We have our network object, but this network does not tell us much about the duality that exists between individuals and groups. This network shows us the ties that exist between individuals and the groups they are associated with. In the spirit of duality, we are more interested in the symbolic connections that exist between individuals who share ties to others through their mutual affiliation of groups. We can also measure the duality between groups who share ties based on the characters that affiliate with them.
+
+To measure these in R, we can use the bipartite_projection() argument to calculate the two one mode graphs that represent the duality within this graph. In this case, these symbolic connections between characters are based on shared affiliation to groups and symbolic connections between groups based on shared characters who affiliate with them.
+
+```{r}
+hp_project <- bipartite_projection(hp_aff)
+```
+
+The hp_project object now has the symbolic ties (weighted) that exists between the characters (stored as proj1) and groups (stored as proj2). Let's call this object and you will see that it is a list of these two networks.
+
+```{r}
+hp_project
+```
+
+In order to further explore these, we want to look at them individually. This chunk pulls out the duality that exists between the characters based on their mutual affiliation to groups
+
+```{r}
+characters <- hp_project$proj1
+```
+
+This chunk pulls out the duality that exists between the groups who share characters.
+
+```{r}
+groups <-hp_project$proj2
+```
+
+They are both new network objects that we have called 'characters' and 'groups.' Now we can analyse these dual/symbolic connections. Let's start by looking at the symbolic connections that exist between groups based on the characters who affiliate with them.
+
+## Analysing The Symbolic Networks
+
+We now have networks representing these symbolic ties that we can analyse. There are two steps to this analysis that we can do. First, is to simply visualise them. Second, take a deeper look at the structure of these networks in terms of clusters. You may also wish to explore centrality or network level measures. However, that goes beyond the scope of this activity.
+
+### Groups
+
+We can visualise this network, and you will see that they are the groups. We use the edge.width() argument to set the width of the ties between the groups equal to the number of characters that they share. We can think of this as the strength of their symbolic connections.
+
+What do you observe here? What groups have a stronger symbolic connection than others? What does that tell us about those groups and their affiliates?
+
+```{r}
+groups
+par(mar =c(0,0,2,0))
+set.seed(123)
+plot(groups, vertex.shape = "square", edge.width = E(groups)$weight, main = "Projection 2: Groups that Share Characters")
+```
+
+Based on your observations on the network, it appears that certain groups share more characters than others. We could conceive them as being more similar than others, perhaps. We can even try identifying communities of groups that share characters. This would indicate if there are certain groups that share more characters together than others.
+
+```{r}
+walk_grou <- cluster_walktrap(groups)
+par(mar =c(5,0,2,0))
+set.seed(123)
+plot(walk_grou, groups, vertex.shape = "square", edge.width = E(groups)$weight, main = "Projection 2: Groups that Share Characters", sub = "Walktrap Communities Highlighted")
+```
+
+It is always best practice to check the sensitivity of your community detection by comparing your findings using a different algorithm. Here we use louvain to do so.
+
+```{r}
+louv_group <- cluster_louvain(groups)
+set.seed(123)
+plot(louv_group, vertex.shape = "square", groups, edge.width = E(groups)$weight, main = "Projection 2: Groups that Share Characters", sub = "Louvain Communities Highlighted")
+```
+
+What conclusions can we draw from this analysis?
+
+There are clearly two distinct clusters of groups symbolically connected through the number of students who affiliate with them. Those of you who know Harry Potter, you clearly see a "good" and "bad" divide in this network visual! This visualisation identifies some groups that actually bridge across the "good" and "bad" groups in the story. The Order of the Phoenix and the Prefects.
+
+### Individuals
+
+Let's do the same for characters connected to other characters by mutual affiliation to groups. We can start by looking at the network.
+
+```{r}
+set.seed(123)
+plot(characters, vertex.color = "green", vertex.label.cex = 0.5, vertex.size = 7, layout = layout_with_fr(characters), main = "Projection 1: Characters who Share Groups")
+```
+
+Take a look at how the nodes are distributed. What does this visualisation suggest to you about these characters?
+
+Based on the initial visualisation of the network, it appears that there are clusters of characters who are symbolically connected to others based on their mutual affiliation to groups. Like we did with the groups, let's see whether there really are groups of individuals by using community detection algorithms.
+
+```{r}
+walk_characc <- cluster_walktrap(characters)
+set.seed(123)
+plot(walk_characc, characters, vertex.label.cex = 0.5, vertex.size = 7, layout = layout_with_fr(characters), main = "Projection 1: Characters who Share Groups", sub = "Walktrap Communities Highlighted")
+```
+
+Again, let's check what we find by using another algorithm. We will use louvain, once more.
+
+```{r}
+louv_charac <- cluster_louvain(characters)
+set.seed(123)
+plot(louv_charac, characters, vertex.label.cex = 0.4, layout = layout_with_fr(characters), vertex.size = 7, main = "Projection 1: Characters who Share Groups", sub = "Louvain Communities Highlighted")
+```
+
+These visualisations suggest, that our initial observations were right. There appears to be a few tightly connected clusters in this network. This would suggest that there are some characters in the network that share more affiliations with some more than they do others.
+
+## Conclusion
+
+In sum, you have now taken a two mode network and created two one mode networks based on the duality of the characters and groups in Harry Potter. You have also identified certain groups and characters that are very prominent or play influential roles within these networks. You have also identified communities of characters and groups within these projected networks. When analysing these you want to talk about them as projected or implied networks. Refer to Breiger's (1974) paper on duality of persons and groups for more on discussing such networks.
+
+
+## References
+
+Breiger, R. L. (1974). The duality of persons and groups. Social Forces, 53(2), 181-190. DSA. n.d. “ADAPT Course Model.” NC State Data Science and AI Academy. Retrieved April 30, 2025 (https://datascienceacademy.ncsu.edu/courses/course-model/).
