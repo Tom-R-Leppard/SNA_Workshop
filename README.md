@@ -6,8 +6,7 @@ Social scientists often speak of social structure, relationships, and the flow o
 
 In this material, you will learn the fundamentals of social network analysis using RStudio. Attendees can expect to learn the fundamentals of social network analysis; including basic data management, more advanced analytic tools that use network data to inform us about the structure and nature of social relations, and basic visualisation. This course does not require experience in coding. Attendees of all stages and abilities are welcome. Free online resources for students will be provided to aid advancement beyond this course. 
 
-The materials in these workshops have been publishes in a book and teaching publication:
-
+The materials in these workshops have been published in various outlets:
 Leppard, Tom R. “Social Network Analysis: A Guide Using Principles of the ADAPT Model.” 2025. Available at: https://tom-r-leppard.github.io/SP25_SNA_Book/
 
 Leppard, Tom R. 2025. “The Magic of Duality: Mapping Individuals and Groups Using Harry Potter Networks”. TRAILS: Teaching Resources and Innovations Library for Sociology, August. Washington DC: American Sociological Association. https://trails.asanet.org/article/view/the-magic-of-duality-mapping.
