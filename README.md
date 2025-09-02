@@ -9,6 +9,11 @@ Social scientists often speak of social structure, relationships, and the flow o
 In this material, you will learn the fundamentals of social network analysis using RStudio. Attendees can expect to learn the fundamentals of social network analysis; including basic data management, more advanced analytic tools that use network data to inform us about the structure and nature of social relations, and basic visualisation. This course does not require experience in coding. Attendees of all stages and abilities are welcome. Free online resources for students will be provided to aid advancement beyond this course. 
 
 ## ORIENTATION
+This Github reposotiry has multiple materials ranging from basic introductory to more advanced methods. It is all free for your use. However, I, you instructor, will direct you to which files we will be using for the workshop you are attending. 
+
+You will be using R script and quarto documents in this workshop. If you are unfamiliar with these, terms, no worries! Just click on the folder in the main [Github repo](https://github.com/Tom-R-Leppard/SNA_Workshop ) page marked "script files" and download the files for the workshop you are taking. 
+
+## GETTING STARTED
 To get going, you will need to download R and Rstudio. Please follow [these slides](https://docs.google.com/presentation/d/e/2PACX-1vQ2tUVmEaI9ZYzbodrtJLYKMmeswqOo5T2fsShbQl4Rbu1D-SMjGBcJp2q07cl8v2KapSLNeZKpnkjo/pub?start=false&loop=false&delayms=3000&slide=id.g30e7f92037d_0_12) written by Jeanne McLure to do so. 
 
 If you are unable or unwilling to download the software, no worries. Head over to [Posit cloud](https://posit.cloud/plans/free) and create a freee acount. Once you have created your account, please open a new Rstudio project. This is a cloud-based version of the software that you can use. 
