@@ -1,0 +1,62 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Two Mode Networks - Edgelists
+
+This is a continuation of the previous section working with two mode networks. The same learning elements apply here as applied in [Chapter 9](Two%20Mode%20Networks%20-%20AM.qmd).
+
+```{r}
+library(igraph)
+library(ADAPTSNA)
+```
+
+There is a slightly different approach to bringing in Two mode network data from an Edgelist than from an Adjacency matrix. Instead of a two mode matrix, you may have edgelist data in two mode format.
+
+```{r}
+hp_tm_edgelist <- load_data("Harry Potter_Two_Mode_Edge.csv")
+
+head(hp_tm_edgelist)
+```
+
+Different from the adjacency matrix, this edge list has one type of node in one column and the other type in the second column.
+
+This is the same process as any other network created from an edgelist. Directed is set to FALSE because there is not really a direction between individuals and groups. Rather, the ties are a marker of affiliation.
+
+```{r}
+hp_tm_net <- graph_from_data_frame(hp_tm_edgelist, directed = FALSE)
+```
+
+Let's check to see if this is actually a two mode network using bipartite_mapping. This function goes through the edgelist an ensures that the columns have distinct nodes in them (i.e. it is truly a bipartite or two mode network).
+
+```{r}
+bipartite_mapping(hp_tm_net)
+```
+
+It recognises that there are two types of node in this object, so we can set that as a vertex characteristic. In turn, this changes the network from a one mode to a two mode network.
+
+```{r}
+V(hp_tm_net)$type <- bipartite_mapping(hp_tm_net)$type
+```
+
+Now we have changed it into a two mode network and added the characteristic "type" that we are familiar with from working with an adjacency matrix like we did in [Chapter 8](Two%20Mode%20Networks%20-%20AM.qmd).
+
+```{r}
+V(hp_tm_net)$type 
+```
+
+You see the true and false statements, as we expect to see. Since this is the case, we will need to use the same +1 alteration to the arguments in our visualisation.
+
+When we plot it, it looks how we expect!
+
+```{r}
+shapes <- c("circle", "square")
+colors <-c("green", "orange")
+
+plot(hp_tm_net, vertex.color=colors[V(hp_tm_net)$type+1],
+     vertex.shape=shapes[V(hp_tm_net)$type+1], vertex.label = NA)
+```
+
+## Summary 
+
+Final things to remember here about two mode networks are that, just like one mode network data, they can be stored as either a matrix or an edgelist. When bringing in a two mode network from an adjacency matrix, you can convert the data into a network object using the graph_from_biadjacency_matrix() function so long as you have set it as matrix. When bringing in a two mode network from an edgelist, you have to set the bipartite characteristic.
