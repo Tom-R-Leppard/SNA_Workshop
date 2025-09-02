@@ -1,0 +1,175 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Node and Edge Attributes
+
+```{r}
+library(igraph)
+library(ADAPTSNA)
+```
+
+Your network may have some edge characteristics. What this means is that the network has qualitative or quantitative information regarding the connections between nodes. These could be things that denote a certain type of connection between individuals in the network (romantic vs. friend, positive vs. negative, kinship vs. friend). These qualitatively different categories tell us more about the types of relationships that there are between the nodes in our network. Meanwhile, quantitative information can also tells us more about the information. Quantitative information could include things like frequency of communication. Such information is termed the edges "weight" indicating that there are substantively meaningful differences between the levels of connection (for example interacting only once compared to 10 times).
+
+Additionally, your network may have some information about the nodes. Such information could include categorical information (e.g demographics or other categories) or numeric information (e.g. age). This means we can inform our visualisation to portray the information about the nodes.
+
+All of this information can be attached to our edgelist. You can also do this on an adjacency matrix but it is not as straightforward. To learn the process, let's stick with edgelists.
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| LEARNING ELEMENTS - Data Perspectives and Practices                                                                                                                                                                 |
++=====================================================================================================================================================================================================================+
+| -   Network data can have missingness. If the node and edge characteristics are important to your study, then you may consider trimming your network to include only those who you have that information for.       |
+|                                                                                                                                                                                                                     |
+| -   Putting together pieces of network data. Recognise that the network itself can include data beyond just the existence of a tie. This section covers how to create a network object that has all available data. |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+## Getting to know these data
+
+This dataset has a lot more information about these individuals and their relationships than others we have used this far. We have two excel spreadsheets (.csv) one called vertices and the other called edges. The vertices sheet has information about each individual node in the network while the edges contains both the edges that exist as well as information about them. Let's read them in and take a look at them
+
+```{r}
+vertices.df <- load_data("Node data.csv")
+edges.df <- load_data("Edge data.csv")
+```
+
+Let's take a look at these one at a tine to get an idea of what information we have.
+
+```{r}
+head(edges.df)
+```
+
+We have an edgelist between A-F people. In this edgelist we have the frequency of interaction and the affinity (i.e. if they are positive or negative interactions).
+
+```{r}
+head(vertices.df)
+```
+
+We have their name, age and two categorical variables about them, their role (if they are a DJ or something else) and their sex (Male/Female).
+
+Now I can create a network object in igraph using the familiar method you are used to - graph_from_data_frame(). However, We want this network to have all the information possible. For this, we don't just want the edge information, but also the node level information. To do this, we tell R that the data = the edgelist.df (a familiar step to you pros now!), and the vertex characteristics are stored in the object we created earlier, vertices.df. Think of this step as simply pulling information from your edgelist (E) and your vertices dataset (V) into your network object.
+
+```{r}
+graph <- graph_from_data_frame(d = edges.df, vertices = vertices.df , directed = FALSE)
+
+graph
+```
+
+Nice work! You can see the vertex information is stores as v characteristics (name, age, role and gender. The edge characteristics are stored as e characteristics - freq, affinity. Now lets visualise the network and see what we have.
+
+```{r}
+plot(graph)
+```
+
+Here comes the fun part. First, let's start with the edge characteristics. Rapid fire, we can visualise these in may different ways.
+
+## Exploring Edge Characteristics
+
+We will create a few visuals to demonstrate the information about these edges. The main think you need to remember is that you access the edge information of your network using the E() option.
+
+Let's start with the numeric information we have about the edges. First, we will change the width of the lines between nodes to reflect the frequency of interactions using the edge.width argument and the freq edge characteristic.
+
+```{r}
+plot(graph, edge.width = E(graph)$freq)
+```
+
+Or, we can label the nodes with the frequency to tell a similar story. We do this using the edge.label argument.
+
+```{r}
+plot(graph, edge.label = E(graph)$freq)
+```
+
+What do these visuals tell you about their relationships compared to the first one?
+
+Now let's use the categorical information to tell a slightly different story. Let's see what we can do to demonstrate the levels of affinity between these individuals. First, we will change the line type to reflect the different levels. To do this, we first create a logical comparison using an ifelse statement. This checks if the affinity attribute of each edge is equal to "pos". This will return a logical vector (TRUE or FALSE for each edge). If the edge is "pos" then it will return an item of the vector "solid" if it is false (i.e. "neg"), then it will return "dotdash". We can then visualise this in the network using the edge.lty (lty means line type) argument.
+
+```{r}
+
+#change the line type using edge.lty to match the affinity
+type_affinity <- ifelse(E(graph)$affinity == "pos", "solid", "dotdash")
+# Plot plus colour
+plot(graph, edge.lty = type_affinity)
+```
+
+Now, let's combine a few approaches. We will use the same ifelse statement but will apply it to the colours of the edges. We will also change the edge labels to reflect the affinity label alongside the line type.
+
+```{r}
+affinity <- ifelse(E(graph)$affinity == "pos", "blue", "red")
+plot(graph, edge.color = affinity, edge.label = E(graph)$affinity, edge.lty = type_affinity)
+```
+
+## Exploring Vertex Attributes
+
+Now let's turn to the rest of our data and explore the network's vertex attributes. Like before, you access the vertex information in your graph object using the V() option.
+
+We will start with the numerical characteristics of the attributes - their age. First, let's change the labels to show their age.
+
+```{r}
+plot(graph, vertex.label = V(graph)$age)
+```
+
+Now, let's change the colours based on certain parameters that we set using an ifelse() statement.
+
+```{r}
+over_22 <- ifelse(V(graph)$age > 22, "red", "white") 
+plot(graph, vertex.color = over_22, veterx.label.color = "Black")
+```
+
+Next, let's work with the categorical variables. First we can change the labels to show these, and then change the colours. See if you can follow the following code chunks and think about what these new networks tell us.
+
+```{r}
+plot(graph, vertex.label =V(graph)$gender)
+```
+
+```{r}
+plot(graph, vertex.label = V(graph)$role)
+```
+
+```{r}
+gender <- ifelse(V(graph)$gender == "M", "orange", "blue")
+plot(graph, vertex.color = gender, vertex.label.color = "white")
+```
+
+We have done a lot with ifelse statements here. This are great for setting direct parameters or for working with dichotomous categories (i.e. the male/female one we have). However, we may want to create colours for categories that have more than one and then visualise it. We are going to use a different package, called dplyr to manipulate what we have to create a vertex attribute that reflect colours based on a categorical variable (their role).
+
+```{r}
+library(dplyr)
+```
+
+To do this, we will return to the original dataframe storing information about the vertex characteristics. Then, we will use the mutate() function to create a new variable that reflect a colour for each role. See if you can follow the logic and look at what we end up with.
+
+```{r}
+vertices.df <- vertices.df %>%
+  mutate(role_colour = ifelse(role == "DJ", "blue", role)) 
+vertices.df <- vertices.df %>%
+  mutate(role_colour = ifelse(role == "MC", "orange", role_colour))
+vertices.df <- vertices.df %>%
+  mutate(role_colour = ifelse(role == "crew", "green", role_colour))
+
+head(vertices.df)
+```
+
+Here is the breakdown of the above code, the mutate function creates a new variable (what we call role_colour). We then use an ifelse() statement again to replace this new variable with the name of a colour that matches each category that we have. So, the first line adds the colour "blue" if role (our original categorical variable) is set to "DJ". If it is not, we replace it with the rest of the role variable. You could just leave that blank, or NA and then those cells would reflect that. So, if you were to run only that first line, you would see a new column in your dataset with some cells saying blue while the rest refelect the other categories. The next few lines of code repeat the same logic, but there is a small difference. Instead of replacing the new variable (role_colour) with the old variable (role) if the logic in the ifelse() statement if false as we did in the firs tline, we replace it with the new variable. We do that because we want to keep the replacements we have done already already.
+
+Now, let's recreate our new network object following the above method.
+
+```{r}
+graph <- graph_from_data_frame(d = edges.df, vertices = vertices.df , directed = FALSE)
+
+graph
+```
+
+The network has the new v characteristic that we created - role_colour. Now we can visualise this network with the different colours for the roles all represented on the visual.
+
+```{r}
+plot(graph, vertex.color = V(graph)$role_colour, vertex.label.color = "white")
+```
+
+## Summary
+
+Your network data might have more information about the individuals and their relationships. In this section, you have learned how to:
+
+1.  Structure node and vertex attributes in data frames and bring them into R.
+2.  How to create a network object that contains the vertex and edge attributes.
+3.  How to transform the network data you have to generate visualisations portraying these node and edge attributes.
+
+GREAT WORK!
