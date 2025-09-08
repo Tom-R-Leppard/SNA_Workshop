@@ -1,0 +1,218 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Introducing Network Analysis
+
+### Tom R. Leppard
+
+One of the first steps to wrangling network data is to understand how it is strcutured. This section will walk you through the basic ways that network data is structured and demonstrate how to bring them into the R envrionment. Then, we will work on converting these data objects into network objects in R using the igraph package.
+
+Keep in mind, you be using network data that is already stored into these formats or may be formatting original data. We will first discuss edgelists and then adjacency matrices. Regardless of how your data is structured, the easiest way to store any network data is in a .csv excel file.
+
+Before we dive in, let's talk about direction. This is important because it influences the way we create the network. A network can be either directed or undirected, meaning that the ties existing between the nodes could be one way or inherently mutual. The direction depends on whether a person can 'nominates' another. A simple example of an undirected connection is a family tie, whereas friendship could be directed. One person might say that they are friends with someone, but that someone may not return the friendship.
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| LEARNING ELEMENTS - Data Perspectives                                                                                                                                                                                                                                                                                                                                                                   |
++=========================================================================================================================================================================================================================================================================================================================================================================================================+
+| -   Consider that social network data can be sensitive! It is ethical to de-identify people in the networks. We deal with fictional characters or public figures with pseudonames in these exercises.                                                                                                                                                                                                   |
+|                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -   Network data are notoriously difficult! An important aspect of any research is to recognise the limitations of your data. Your network may not be representative of the whole group you are studying (let's say not everyone is represented in the network). So, you need to either seek more representative data, or simply admit these limitations in whatever report or article you are writing. |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+# Getting Started
+
+If this is your first time using R, welcome! Take a look [here](https://tom-r-leppard.github.io/SP25_SNA_Book/Getting%20Started.html) for my introduction the R environment when you have a change.
+
+In the meantime, you will need to run the following code to access the things (packages and data sets) we are using in this workshop
+
+```{r, eval = FALSE}
+# Network Package
+install.packages("igraph")
+
+# Package to access data
+# Make sure you have "remotes" installed first
+install.packages("remotes")
+remotes::install_github("Tom-R-Leppard/ADAPTSNA")
+```
+
+```{r}
+library(ADAPTSNA)
+library(igraph)
+```
+
+## Edgelists
+
+Your data may be stored as an edgelist. An edgelist is what it says, a list of edges or relationships that exist between the nodes in your network. Since these are edges between nodes, the data are stored in a dyadic format (pairs).
+
+Split across two columns you have the names of everyone in the network that share a connection. The basic format for any edgelist is to have a 'from' and a 'to' column. The titles of the columns are arbitrary, but are helpful for you as the researcher, especially if the connection is directed. You may wish to call the columns 'sender' and 'receiver.'
+
+This code chunk shows how to read in a .csv that is formatted as an edgelist. Note, the header = TRUE option tells R that the first row are headers (column names). Using the head() command, we see the first lines of these network data.
+
+This is a network of romantic affiliations based on students from the Harry Potter saga. Note the column names reflect this.
+
+PAUSE AND THINK: Is this a directed or an undirected network? What can you see to indicate whether it is or is not?
+
+```{r}
+my_edge <- load_data("Hogwarts Crushes Edgelist.csv", header = TRUE)
+
+head(my_edge)
+```
+
+This network is directed. These are individuals who have romantic feeling for others in the storyline of Harry Potter. Romantic ties, may not be reciprocated (poor Snape!). As you look through this network, you can see the ties that exist. Take a look at the first six rows above, Harry 'sends' to Ginny, he also sends to Cho. You could look through the whole dataset and identify where the ties exist and who sends to whom!
+
+## Adjacency Matrices
+
+Your data may be stored as an adjacency matrix. An adjacency matrix is a datasheet that uses a numerical system (usually a binary system 0 and 1 for unweighted networks) to denote the ties that exist between cells in the spreadsheet. 0 indicates no tie and 1 indicates a tie. In a weighted network, the number may be higher than 1 (i.e. to indicate the number of interactions, the distance, or other weight).
+
+The most important element of an adjacency matrix is that the first row and the first column have the list of nodes. Each cell is an individual node and this node is mirrored on the other side of the matrix. For example, cell A2 is the same as B1. These two lines (the first row and column) must have the same names in them in order for R to recognise it as a network. In other words, an adjacency matrix has all the possible dyads (pairs) in the network with 1s and 0s to indicate whether they share a tie. Note that A1 should always be left empty.
+
+One final characteristic of an adjacency matrix is the line where the same cell overlaps. This is called the diagonal. Cell A2 and B1 are the same name, the coordinates whether those cells meet (B2) can indicate whether that node is connected to itself. The same is true all the way down the diagonal of the matrix. The researcher (YOU) must decide whether self loops/ties make sense given the characteristics/parameters of the network when you collect network data. For example, in a network of sending text messages, it may not make sense.
+
+This code chunk shows you how to bring in a .csv with network data stored as an adjacency matrix. These data are the same data as before - crushes between Harry Potter Characters. Note, the row.names = 1 option is used here to ensure R recognises row 1 as names not connections.
+
+```{r}
+my_adj  <- load_data("Hogwarts Crushes matrix.csv", row.names=1)
+
+head(my_adj)
+```
+
+## Making Network Objects
+
+Now we know how network data are stored, there are a couple of steps we need to take before we can get analysing our networks. In short, we need to convert our edgelist or adjacency matrix into a network using some functions that the igraph package provides. Let's start with edgelists and then move on to adjacency matrices.
+
+Our edgelist is very simple to convert into a network. First, we will need to tell R that the commands we are running from here on are igraph. So in this next chunk we will use the library() command to let R know.
+
+In the next line, we use the graph_from_data_frame() function from igraph to create an object called g1 which is our first network.
+
+```{r}
+g1 <- graph_from_data_frame(my_edge, directed = TRUE)
+```
+
+For an adjacency matrix, things are slightly different. At the moment, our object 'my_adj' looks like a matrix, it has the 1s and 0s, but R recognises it as a table. We need to create an object that R recognises is a matrix. In short, R needs to recognise the 1s as ties and the 0s as the lack of ties.
+
+So, you will notice in the chunk below there are two steps instead of just one. The first, we use the as.matrix() function to create a new object called 'mat' (call these whatever you want) that now has the same information as 'my_adj' but now stored as a matrix. Next, we use the graph_from_adjaency_matrix() function to convert this matrix into what R recognises as a network and create g2.
+
+```{r}
+mat <- as.matrix(my_adj) #Creates an object R recognises as a matrix not a table. 
+g2 <- graph_from_adjacency_matrix(mat, mode = 'directed', diag = FALSE)
+```
+
+Great, now we have our network objects! Let's understand what these networks look like. They will look exactly the same because they represent the same ties. So, let's look at g1 and understand how igraph stores networks. To view it, we simply name the object. I want to draw your attention to a few places. It lists it as an igraph object, a network. The DN means directed network. Then it lists 12 and 15. These are how many nodes and how many edges there are in the network. The second line lists all the attributes R can recognise from the network we pulled in (there are all kinds of information we could have about the people and their relationships). In this case, we have their names and that is it. Then it lists the edges that exist between the individuals in this network. Notice that the link between them looks like an arrow -\>? If this was an undirected network, the link would look like this --.
+
+```{r}
+g1
+```
+
+Finally, you can use the plot() function to visualise the network. I plot one, then the other. They reflect the same data but stored and brought into RStudio in different ways.
+
+```{r}
+plot(g1)
+```
+
+```{r}
+plot(g2)
+```
+
+## TWO MODE NETWORK
+
+In society, connectivity is not defined by one type of node. Individuals can be connected to groups, for example. This is a classic example of a two mode network. Here, staying in the world of Harry Potter, we will map the relations of Harry Potter characters to the various groups in the series.
+
+## Bringing in Two Mode Network Data Stored as a Matrix
+
+Just like one mode network data, two mode network data can be stores as matrices or edgelists. Here we will cover two mode data from an adjacency matrix. There are further tutorials on [the github](https://github.com/Tom-R-Leppard/SNA_Workshop/tree/main/Introductory%20Workshop) repo that demonstrate how to bring in two mode network data from an edgelist.
+
+```{r}
+
+hog_two_data  <- load_data("Harry Potter_Two_Mode_AM.csv", row.names=1)
+hog_two_matrix <- as.matrix(hog_two_data)
+
+head(hog_two_matrix) # just want to take a look
+```
+
+Now use 'graph_from_biadjacency_matrix() to tell R it is a two mode network.
+
+```{r}
+hp_aff <- graph_from_biadjacency_matrix(hog_two_matrix)
+
+
+plot(hp_aff, vertex.label = NA) # toggle labels off to see the nodes better
+```
+
+Can't really tell the groups from the students here! So, we can play with the colours to better differentiate.
+
+```{r}
+par(mar =c(0,0,0,0))
+set.seed(123)
+
+plot(hp_aff, vertex.color = V(hp_aff)$type)
+
+```
+
+Let's make the visualisation much clearer between the two types of nodes.
+
+We can do this by changing the shape and the colour of each type of node. I set a vector with the colours and shapes I want
+
+```{r}
+shapes <- c("circle", "square")
+colors <-c("green", "orange")
+```
+
+Then we can plot them based on these design parameters
+
+```{r}
+par(mar =c(5,0,2,0))
+set.seed(123)
+plot(hp_aff, vertex.color=colors[V(hp_aff)$type+1],
+     vertex.shape=shapes[V(hp_aff)$type+1], vertex.label.cex = 0.5, vertex.size = 7, main = "Harry Potter", sub = "Characters Connected to Groups")
+```
+
+Here, I tell R to use the indices I’ve defined in the shapes and colors vectors and apply those to the network using the vertex.shape and vertex.color arguments. Notice that I need to state type + 1 in both of these arguments. It might look a bit unusual at first, but it makes sense once we take a closer look at what R does behind the scenes.
+
+The "type" vertex characteristic is stored as TRUE or FALSE. You can verify this by running the code V(hp_aff)\$type. This will display a long list of TRUE and FALSE values, which are stored in R as logical values: TRUE is equivalent to 1, and FALSE is equivalent to 0. Meanwhile, the index values for our shapes and colors vectors are stored differently. R always starts indexing at 1. In our colors vector, "green" is stored at index 1 and "orange" at index 2. For the shapes vector, "circle" is stored at index 1 and "square" at index 2.
+
+Thus, there’s a mismatch between how the "type" characteristic is stored (as 1/0) and the way the shapes and colors vectors are indexed (which start from 1). To fix this, we add +1 to the type values, so that FALSE (which is stored as 0) becomes 1, and TRUE (which is stored as 1) becomes 2.
+
+In this network, the second mode (which represents the "groups" in the bipartite network) is always considered to be the "TRUE" type. So, this means that the "characters" (the first mode, FALSE or 0) are displayed with green circles, and the "groups" (the second mode, TRUE or 1) are displayed with orange squares.
+
+So, that visualisation was a lot better than the first! However, we can add a legend to the visualisation to further explain the network. You have to be mindful that some people may not see colours too well. So, differentiating the colours might not be so useful. Adding the legend on the plot can help orient people a little more to the visualisation you are presenting. Here we repeat the code from above to reproduce the plot. Then, you can use the legend() function to further explain the plot.
+
+```{r}
+par(mar =c(5,1,2,1))
+set.seed(123)
+plot(hp_aff, vertex.color=colors[V(hp_aff)$type+1],
+     vertex.shape=shapes[V(hp_aff)$type+1], vertex.label.cex = 0.5, vertex.size = 7, main = "Harry Potter", sub = "Characters Connected to Groups")
+
+legend("bottomleft", 
+       legend = c("Characters (circle)", "Groups (square)"), 
+       fill = c("green", "orange"), 
+       title = "Node Types")
+```
+
+## Activity
+
+Once you have replicated the above networks, create your own network from the example adjacency matrix provided (Example AM - Intro Workshop.csv).
+
+Follow these steps:
+
+1.  Download Example AM - Intro Workshop.csv from [the github](https://github.com/Tom-R-Leppard/SNA_Workshop/tree/main/Introductory%20Workshop) repo.
+2.  Copy and run this code: my_data \<- read.csv(file.choose(), row.names=1)
+3.  Follow this tutorial to visualise that network.
+
+If you want to go the extra mile, make your own network data. You might open the Example AM - Intro Workshop.csv and change the names and ties based on a network you want to see! Then pull it into R and take a look!
+
+WELL DONE!
+
+## Summary
+
+Here you have learned four things:
+
+1.  How network data are stored (an edge list or adjacency matrix)
+
+2.  Learn the difference between a one and a two mode network
+
+3.  How to bring network data into RStudio and understand it
+
+4.  How to plot network data.
+
+NICE WORK ;)
