@@ -18,6 +18,6 @@ This Github reposotiry has multiple materials ranging from basic introductory to
 You will be using R script and quarto documents in this workshop. If you are unfamiliar with these, terms, no worries! Just click on the folder in the main [Github repo](https://github.com/Tom-R-Leppard/SNA_Workshop ) page to download the files for the workshop you are taking. 
 
 ## GETTING STARTED
-To get going, you will need to download R and Rstudio. Please follow [these slides](https://docs.google.com/presentation/d/e/2PACX-1vQ2tUVmEaI9ZYzbodrtJLYKMmeswqOo5T2fsShbQl4Rbu1D-SMjGBcJp2q07cl8v2KapSLNeZKpnkjo/pub?start=false&loop=false&delayms=3000&slide=id.g30e7f92037d_0_12) written by [Jeanne McLure](https://github.com/gigimcc4) to do so. 
+To get going, you will need to [download](https://posit.co/download/rstudio-desktop/) R and Rstudio. Please follow [these slides](https://docs.google.com/presentation/d/e/2PACX-1vQ2tUVmEaI9ZYzbodrtJLYKMmeswqOo5T2fsShbQl4Rbu1D-SMjGBcJp2q07cl8v2KapSLNeZKpnkjo/pub?start=false&loop=false&delayms=3000&slide=id.g30e7f92037d_0_12) written by [Jeanne McLure](https://github.com/gigimcc4) to do so. 
 
 If you are unable or unwilling to download the software, no worries. Head over to [Posit cloud](https://posit.cloud/plans/free) and create a freee acount. Once you have created your account, please open a new Rstudio project. This is a cloud-based version of the software that you can use. 
