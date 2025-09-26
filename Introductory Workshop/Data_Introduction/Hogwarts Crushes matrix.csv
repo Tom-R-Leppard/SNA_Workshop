@@ -1,0 +1,13 @@
+"","Harry Potter","Ron Weasley","Hermione Granger","Ginny Weasley","Lily Potter","James Potter","Severus Snape","Nymphadora Tonks","Remus Lupin","Lavender Brown","Cho Chang","Cedric Diggory"
+"Harry Potter",0,0,0,1,0,0,0,0,0,0,1,0
+"Ron Weasley",0,0,1,0,0,0,0,0,0,1,0,0
+"Hermione Granger",0,1,0,0,0,0,0,0,0,0,0,0
+"Ginny Weasley",1,0,0,0,0,0,0,0,0,0,0,0
+"Lily Potter",0,0,0,0,0,1,0,0,0,0,0,0
+"James Potter",0,0,0,0,1,0,0,0,0,0,0,0
+"Severus Snape",0,0,0,0,1,0,0,0,0,0,0,0
+"Nymphadora Tonks",0,0,0,0,0,0,0,0,1,0,0,0
+"Remus Lupin",0,0,0,0,0,0,0,1,0,0,0,0
+"Lavender Brown",0,1,0,0,0,0,0,0,0,0,0,0
+"Cho Chang",1,0,0,0,0,0,0,0,0,0,0,1
+"Cedric Diggory",0,0,0,0,0,0,0,0,0,0,1,0
