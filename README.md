@@ -13,7 +13,7 @@ Leppard, Tom R. “Social Network Analysis: A Guide Using Principles of the ADAP
 Leppard, Tom R. 2025. “The Magic of Duality: Mapping Individuals and Groups Using Harry Potter Networks”. TRAILS: Teaching Resources and Innovations Library for Sociology, August. Washington DC: American Sociological Association. https://trails.asanet.org/article/view/the-magic-of-duality-mapping.
 
 ## ORIENTATION
-This Github reposotiry has multiple materials ranging from basic introductory to more advanced methods. It is all free for your use. However, I, you instructor, will direct you to which files we will be using for the workshop you are attending. 
+This Github repository has multiple materials ranging from basic introductory to more advanced methods. It is all free for your use. However, I will direct you to which files we will be using for the workshop you are attending. 
 
 You will be using R script and quarto documents in this workshop. If you are unfamiliar with these, terms, no worries! Just click on the folder in the main [Github repo](https://github.com/Tom-R-Leppard/SNA_Workshop ) page to download the files for the workshop you are taking. 
 
